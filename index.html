@@ -1,661 +1,470 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#000000">
-<title>Checklist MGN FIBRA</title>
-<style>
-  :root{
-    --vermelho:#ED1C24;
-    --vermelho-escuro:#B3151B;
-    --preto:#000000;
-    --preto-suave:#FBEAEA;
-    --branco:#FFFFFF;
-    --cinza-claro:#8A8A8A;
-    --cinza-escuro:#ED1C24;
-  }
-  *{box-sizing:border-box; margin:0; padding:0;}
-  html,body{
-    background-color:var(--branco);
-    background-image:
-      radial-gradient(circle at 8% 12%, rgba(237,28,36,0.10), transparent 40%),
-      radial-gradient(circle at 92% 88%, rgba(237,28,36,0.10), transparent 40%),
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 1600'%3E%3Cg fill='none' stroke='%23ED1C24' stroke-width='2'%3E%3Cpath opacity='0.18' d='M-100 60 C 150 10, 300 130, 550 60 S 900 10, 1100 90'/%3E%3Cpath opacity='0.13' d='M-100 110 C 150 60, 300 180, 550 110 S 900 60, 1100 140'/%3E%3Cpath opacity='0.10' d='M-100 160 C 150 110, 300 230, 550 160 S 900 110, 1100 190'/%3E%3Cpath opacity='0.18' d='M-100 1440 C 150 1390, 300 1510, 550 1440 S 900 1390, 1100 1470'/%3E%3Cpath opacity='0.13' d='M-100 1490 C 150 1440, 300 1560, 550 1490 S 900 1440, 1100 1520'/%3E%3Cpath opacity='0.10' d='M-100 1540 C 150 1490, 300 1610, 550 1540 S 900 1490, 1100 1570'/%3E%3C/g%3E%3C/svg%3E");
-    background-repeat:no-repeat, no-repeat, no-repeat;
-    background-size:cover, cover, cover;
-    background-position:top left, bottom right, top center;
-    background-attachment:fixed, fixed, fixed;
-    color:var(--vermelho);
-    font-family:'Segoe UI', Roboto, Arial, sans-serif;
-    -webkit-tap-highlight-color:transparent;
-    overscroll-behavior:none;
-  }
-  #app{
-    max-width:480px;
-    margin:0 auto;
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
-    position:relative;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- Meta tags para PWA (App na tela inicial) -->
+    <meta name="theme-color" content="#ED1C24">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Check Fácil">
+    
+    <title>Check Fácil - MGN FIBRA</title>
+    
+    <style>
+        :root {
+            --azul-primario: #ED1C24;
+            --azul-escuro: #B3151B;
+            --azul-bebe: #FDECEC;
+            --branco: #ffffff;
+            --preto: #1a1a1a;
+            --cinza-borda: #cbd5e1;
+            --cinza-claro: #f8fafc;
+        }
 
-  /* ---------- HEADER ---------- */
-  header{
-    padding:22px 20px 18px;
-    border-bottom:3px solid var(--vermelho);
-    background:var(--branco);
-    position:sticky;
-    top:0;
-    z-index:10;
-  }
-  .marca{
-    display:flex;
-    align-items:center;
-    gap:10px;
-  }
-  .marca .mgn{
-    font-size:26px;
-    font-weight:900;
-    letter-spacing:1px;
-    color:var(--vermelho);
-  }
-  .marca .fibra{
-    font-size:26px;
-    font-weight:900;
-    letter-spacing:1px;
-    color:var(--vermelho);
-  }
-  .emblema{
-    width:30px;
-    height:30px;
-    flex-shrink:0;
-    animation:pulsar-brilho 2.4s ease-in-out infinite;
-  }
-  @keyframes pulsar-brilho{
-    0%, 100%{ filter:drop-shadow(0 0 3px rgba(237,28,36,0.5)); }
-    50%{ filter:drop-shadow(0 0 11px rgba(237,28,36,0.95)); }
-  }
-  .subtitulo{
-    font-size:12px;
-    color:var(--cinza-claro);
-    text-transform:uppercase;
-    letter-spacing:2px;
-    margin-top:2px;
-  }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
 
-  /* ---------- TELAS ---------- */
-  .tela{ display:none; flex:1; flex-direction:column; padding:20px; }
-  .tela.ativa{ display:flex; }
+        body {
+            background-color: var(--azul-bebe);
+            color: var(--preto);
+            padding-bottom: 40px;
+        }
 
-  /* Lista de veículos */
-  .grupo-titulo{
-    font-size:13px;
-    text-transform:uppercase;
-    letter-spacing:2px;
-    color:var(--vermelho);
-    font-weight:700;
-    margin:18px 0 10px;
-  }
-  .grupo-titulo:first-child{ margin-top:0; }
-  .veiculo-btn{
-    width:100%;
-    background:rgba(255,255,255,0.88);
-    border:2px solid var(--vermelho);
-    color:var(--vermelho);
-    padding:16px;
-    border-radius:10px;
-    margin-bottom:10px;
-    text-align:left;
-    font-size:16px;
-    font-weight:700;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    transition:all .15s;
-  }
-  .veiculo-btn:active{ background:var(--vermelho); color:var(--branco); }
-  .veiculo-btn:active .veiculo-placa{ color:var(--branco); }
-  .veiculo-placa{ color:var(--cinza-claro); font-size:13px; font-weight:600; }
+        /* Header fixo no topo */
+        header {
+            background-color: var(--branco); /* Fundo branco para combinar com a logo */
+            color: var(--azul-primario); /* Texto azul */
+            padding: 10px 20px; /* Padding ajustado */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px; /* Espaço entre o ícone e o texto */
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
 
-  /* ---------- FORM CHECKLIST ---------- */
-  .voltar{
-    background:none;
-    border:none;
-    color:var(--vermelho);
-    font-size:15px;
-    font-weight:700;
-    padding:0 0 14px;
-    text-align:left;
-  }
-  .veiculo-atual{
-    font-size:20px;
-    font-weight:800;
-    margin-bottom:2px;
-    color:var(--vermelho);
-  }
-  .veiculo-atual-placa{
-    font-size:13px;
-    color:var(--cinza-claro);
-    margin-bottom:18px;
-    letter-spacing:1px;
-  }
+        header h1 {
+            font-size: 26px; /* Aumentei um pouco a fonte */
+            font-weight: 800; /* Deixei mais gordinho */
+            letter-spacing: -0.5px; /* Juntei as letras igual na logo */
+            margin: 0;
+            font-style: italic; /* Deixei em itálico igual a logo */
+        }
 
-  .secao-label{
-    font-size:12px;
-    text-transform:uppercase;
-    letter-spacing:1.5px;
-    color:var(--cinza-claro);
-    margin:18px 0 8px;
-    font-weight:700;
-  }
-  .secao-label:first-of-type{ margin-top:0; }
+        .logo-icon {
+            width: 48px; /* Tamanho do ícone SVG */
+            height: 48px;
+            fill: var(--azul-primario); /* Cor azul primária */
+        }
 
-  /* Grade de fotos */
-  .fotos-grade{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-  }
-  .foto-slot{
-    position:relative;
-    aspect-ratio:1/1;
-    border:2px dashed var(--vermelho);
-    border-radius:10px;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    overflow:hidden;
-    background:var(--preto-suave);
-  }
-  .foto-slot.preenchido{ border:2px solid var(--vermelho); }
-  .foto-slot img{
-    width:100%; height:100%; object-fit:cover;
-  }
-  .foto-slot .icone{
-    font-size:26px;
-    color:var(--vermelho);
-    margin-bottom:6px;
-  }
-  .foto-slot .rotulo{
-    font-size:12px;
-    color:var(--vermelho);
-    text-align:center;
-    padding:0 6px;
-  }
-  .foto-slot .selo{
-    position:absolute;
-    top:6px; right:6px;
-    background:var(--vermelho);
-    color:var(--branco);
-    font-size:11px;
-    font-weight:800;
-    padding:2px 7px;
-    border-radius:20px;
-  }
-  .foto-slot input[type=file]{
-    position:absolute; inset:0;
-    opacity:0; cursor:pointer;
-  }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: var(--branco);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
 
-  /* Campos de texto/numero/data */
-  .campo{ margin-bottom:14px; }
-  .campo label{
-    display:block;
-    font-size:14px;
-    font-weight:700;
-    margin-bottom:6px;
-    color:var(--vermelho);
-  }
-  .campo input[type=text],
-  .campo input[type=number],
-  .campo input[type=date]{
-    width:100%;
-    background:var(--branco);
-    border:2px solid var(--vermelho);
-    color:var(--vermelho-escuro);
-    padding:13px 14px;
-    border-radius:8px;
-    font-size:15px;
-    font-weight:600;
-  }
-  .campo input::placeholder{ color:var(--cinza-claro); opacity:1; }
-  .campo input:focus{
-    outline:none;
-    border-color:var(--vermelho-escuro);
-    background:var(--preto-suave);
-  }
-  textarea{
-    width:100%;
-    background:var(--branco);
-    border:2px solid var(--vermelho);
-    color:var(--vermelho-escuro);
-    padding:13px 14px;
-    border-radius:8px;
-    font-size:15px;
-    font-weight:600;
-    min-height:80px;
-    resize:vertical;
-    font-family:inherit;
-  }
-  textarea::placeholder{ color:var(--cinza-claro); opacity:1; }
-  textarea:focus{ outline:none; border-color:var(--vermelho-escuro); background:var(--preto-suave); }
+        .section-title {
+            font-size: 18px;
+            color: var(--azul-primario);
+            border-bottom: 2px solid var(--azul-bebe);
+            padding-bottom: 8px;
+            margin: 25px 0 15px 0;
+            font-weight: 600;
+        }
 
-  /* Seleção tipo chip (Ok / Baixo / etc) */
-  .chips{
-    display:flex;
-    gap:8px;
-    flex-wrap:wrap;
-  }
-  .chip{
-    flex:1;
-    min-width:90px;
-    text-align:center;
-    padding:12px 8px;
-    border-radius:8px;
-    border:2px solid var(--vermelho);
-    background:var(--branco);
-    color:var(--vermelho);
-    font-size:13px;
-    font-weight:700;
-  }
-  .chip.selecionado{
-    background:var(--vermelho);
-    border-color:var(--vermelho);
-    color:var(--branco);
-    box-shadow:0 0 12px rgba(237,28,36,0.5);
-  }
+        label {
+            font-weight: 600;
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-size: 15px;
+            color: var(--preto);
+        }
 
-  /* Botão salvar */
-  .btn-salvar{
-    margin-top:26px;
-    background:var(--vermelho);
-    color:var(--branco);
-    border:none;
-    padding:17px;
-    border-radius:10px;
-    font-size:17px;
-    font-weight:800;
-    letter-spacing:1px;
-    box-shadow:0 4px 20px rgba(237,28,36,0.35);
-  }
-  .btn-salvar:active{ background:var(--vermelho-escuro); }
-  .btn-salvar:disabled{ opacity:.5; }
+        select, input[type="text"], input[type="number"], input[type="date"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--cinza-borda);
+            border-radius: 8px;
+            background-color: var(--cinza-claro);
+            font-size: 16px;
+            color: var(--preto);
+            transition: all 0.3s;
+        }
 
-  .aviso-erro{
-    background:var(--preto-suave);
-    border:2px solid var(--vermelho);
-    color:var(--vermelho-escuro);
-    padding:10px 14px;
-    border-radius:8px;
-    font-size:13px;
-    font-weight:600;
-    margin-top:14px;
-    display:none;
-  }
+        select:focus, input[type="text"]:focus, input[type="number"]:focus, input[type="date"]:focus {
+            outline: none;
+            border-color: var(--azul-primario);
+            background-color: var(--branco);
+            box-shadow: 0 0 0 3px var(--azul-bebe);
+        }
 
-  /* ---------- TELA SALVANDO / CONFIRMAÇÃO ---------- */
-  .central{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    padding:30px;
-  }
-  .spinner{
-    width:46px; height:46px;
-    border:4px solid var(--preto-suave);
-    border-top:4px solid var(--vermelho);
-    border-radius:50%;
-    animation:girar 0.9s linear infinite;
-    margin-bottom:20px;
-  }
-  @keyframes girar{ to{ transform:rotate(360deg); } }
-  .check-sucesso{
-    width:70px; height:70px;
-    border-radius:50%;
-    background:var(--vermelho);
-    color:var(--branco);
-    display:flex; align-items:center; justify-content:center;
-    font-size:36px;
-    margin-bottom:20px;
-    box-shadow:0 0 30px rgba(237,28,36,0.5);
-  }
-  .central h2{ font-size:20px; margin-bottom:6px; color:var(--vermelho); }
-  .central p{ color:var(--cinza-claro); font-size:14px; }
-  .btn-novo{
-    margin-top:26px;
-    background:none;
-    border:2px solid var(--vermelho);
-    color:var(--vermelho);
-    padding:13px 24px;
-    border-radius:8px;
-    font-weight:700;
-    font-size:14px;
-  }
-</style>
+        /* Estilização do input de arquivo (Câmera) */
+        .file-upload-wrapper {
+            position: relative;
+            margin-top: 5px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px;
+            background-color: var(--azul-bebe);
+            color: var(--azul-primario);
+            border: 2px dashed var(--azul-primario);
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-upload-btn:active {
+            background-color: #cce4ff;
+        }
+
+        .image-preview {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1px solid var(--cinza-borda);
+            display: none;
+        }
+
+        .image-preview.visible {
+            display: block;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        button.submit-btn {
+            width: 100%;
+            padding: 16px;
+            background-color: var(--azul-primario);
+            color: var(--branco);
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            margin-top: 35px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            box-shadow: 0 4px 10px rgba(0, 86, 179, 0.3);
+        }
+
+        button.submit-btn:hover {
+            background-color: var(--azul-escuro);
+        }
+
+        button.submit-btn:disabled {
+            background-color: var(--cinza-borda);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* Loader simples */
+        .loader {
+            display: none;
+            text-align: center;
+            margin-top: 15px;
+            color: var(--azul-primario);
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
-<div id="app">
 
-  <header>
-    <div class="marca">
-      <span class="mgn">MGN</span><span class="fibra">FIBRA</span>
-      <svg class="emblema" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-        <path d="M20 30.5c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3z" fill="#ED1C24"/>
-        <path d="M13 22.5c1.9-1.9 4.4-2.9 7-2.9s5.1 1 7 2.9" stroke="#ED1C24" stroke-width="2.6" stroke-linecap="round" fill="none"/>
-        <path d="M7.5 17c3.3-3.3 7.8-5.1 12.5-5.1s9.2 1.8 12.5 5.1" stroke="#ED1C24" stroke-width="2.6" stroke-linecap="round" fill="none"/>
-      </svg>
-    </div>
-    <div class="subtitulo">Checklist de veículos</div>
-  </header>
+<header>
+    <!-- Ícone SVG de um carro com check embutido -->
+    <svg class="logo-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <!-- Corpo do carro -->
+        <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.04 3H5.81l1.04-3zM19 17H5v-4.66l.12-.34h13.77l.11.34V17z"/>
+        <!-- Rodas (círculos vazios pra dar um estilo) -->
+        <circle cx="7.5" cy="14.5" r="1.5"/>
+        <circle cx="16.5" cy="14.5" r="1.5"/>
+        <!-- Símbolo de Check por cima -->
+        <path d="M10 16.5l-3.5-3.5 1.41-1.41L10 13.67l7.59-7.59L19 7.5l-9 9z" fill="#ffffff" stroke="var(--azul-primario)" stroke-width="1.5"/>
+    </svg>
+    <h1>Check Fácil</h1>
+</header>
 
-  <!-- TELA 1: SELEÇÃO DE VEÍCULO -->
-  <div class="tela ativa" id="tela-veiculos">
-    <div class="grupo-titulo">Carros</div>
-    <div id="lista-carros"></div>
-    <div class="grupo-titulo">Motos</div>
-    <div id="lista-motos"></div>
-  </div>
+<div class="container">
+    <form id="checklistForm">
+        
+        <label for="condutor">Nome do Condutor:</label>
+        <input type="text" id="condutor" placeholder="Nome do condutor" required>
 
-  <!-- TELA 2: CHECKLIST -->
-  <div class="tela" id="tela-checklist">
-    <button class="voltar" onclick="voltarParaLista()">‹ Voltar</button>
-    <div class="veiculo-atual" id="nome-veiculo-atual"></div>
-    <div class="veiculo-atual-placa" id="placa-veiculo-atual"></div>
+        <label for="carro">Viatura:</label>
+        <select id="carro" required>
+            <option value="">Selecione a Viatura</option>
+            <optgroup label="Carros">
+                <option value="CARRO 10 - QYC8082">CARRO 10 - QYC8082</option>
+                <option value="CARRO 11 - KGS2428">CARRO 11 - KGS2428</option>
+                <option value="CARRO 12 - KGH7876">CARRO 12 - KGH7876</option>
+                <option value="CARRO 13 - PCD7H81">CARRO 13 - PCD7H81</option>
+                <option value="CARRO 14 - PDM5A02">CARRO 14 - PDM5A02</option>
+                <option value="CARRO 15 - SOU2G19">CARRO 15 - SOU2G19</option>
+            </optgroup>
+            <optgroup label="Motos">
+                <option value="MOTO 00 - KGG6C97">MOTO 00 - KGG6C97</option>
+                <option value="MOTO 01 - RZK9G76">MOTO 01 - RZK9G76</option>
+                <option value="MOTO 02 - RZK9E26">MOTO 02 - RZK9E26</option>
+                <option value="MOTO 03 - QYW5H43">MOTO 03 - QYW5H43</option>
+                <option value="MOTO 04 - QYW5F83">MOTO 04 - QYW5F83</option>
+                <option value="MOTO 05 - SOT3E81">MOTO 05 - SOT3E81</option>
+            </optgroup>
+        </select>
 
-    <div class="secao-label">Fotos do veículo</div>
-    <div class="fotos-grade">
-      <div class="foto-slot" data-foto="frente">
-        <span class="icone">📷</span>
-        <span class="rotulo">Frente</span>
-        <input type="file" accept="image/*" onchange="carregarFoto(this,'frente')">
-      </div>
-      <div class="foto-slot" data-foto="traseira">
-        <span class="icone">📷</span>
-        <span class="rotulo">Traseira</span>
-        <input type="file" accept="image/*" onchange="carregarFoto(this,'traseira')">
-      </div>
-      <div class="foto-slot" data-foto="lateralEsquerda">
-        <span class="icone">📷</span>
-        <span class="rotulo">Lateral esquerda</span>
-        <input type="file" accept="image/*" onchange="carregarFoto(this,'lateralEsquerda')">
-      </div>
-      <div class="foto-slot" data-foto="lateralDireita">
-        <span class="icone">📷</span>
-        <span class="rotulo">Lateral direita</span>
-        <input type="file" accept="image/*" onchange="carregarFoto(this,'lateralDireita')">
-      </div>
-    </div>
+        <h3 class="section-title">Inspeção Visual (Fotos)</h3>
 
-    <div class="secao-label">Responsável e KM</div>
-    <div class="campo">
-      <label>Responsável pelo veículo hoje</label>
-      <input type="text" id="campo-responsavel" placeholder="Nome do responsável">
-    </div>
-    <div class="campo">
-      <label>KM total do veículo</label>
-      <input type="number" id="campo-km" placeholder="Ex: 45230">
-    </div>
-    <div class="foto-slot" id="foto-km-slot" data-foto="km" style="margin-bottom:18px; aspect-ratio:auto; height:140px;">
-      <span class="icone">📷</span>
-      <span class="rotulo">Foto do KM (painel)</span>
-      <input type="file" accept="image/*" onchange="carregarFoto(this,'km')">
-    </div>
+        <!-- Lateral Esquerda -->
+        <label>Lateral Esquerda:</label>
+        <div class="file-upload-wrapper">
+            <label for="fotoLE" class="file-upload-btn">📷 Tirar Foto</label>
+            <input type="file" id="fotoLE" accept="image/*" onchange="previewImage(this, 'previewLE')" required>
+            <img id="previewLE" class="image-preview" alt="Preview Lateral Esquerda">
+        </div>
 
-    <div class="secao-label">Pneus</div>
-    <div class="chips" id="chips-pneus">
-      <div class="chip" data-valor="Calibrados">Calibrados</div>
-      <div class="chip" data-valor="Descalibrados">Descalibrados</div>
-    </div>
+        <!-- Lateral Direita -->
+        <label>Lateral Direita:</label>
+        <div class="file-upload-wrapper">
+            <label for="fotoLD" class="file-upload-btn">📷 Tirar Foto</label>
+            <input type="file" id="fotoLD" accept="image/*" onchange="previewImage(this, 'previewLD')" required>
+            <img id="previewLD" class="image-preview" alt="Preview Lateral Direita">
+        </div>
 
-    <div class="secao-label" id="label-estepe">Estepe</div>
-    <div class="chips" id="chips-estepe">
-      <div class="chip" data-valor="Ok">Ok</div>
-      <div class="chip" data-valor="Precisa atenção">Atenção</div>
-      <div class="chip" data-valor="Não tem">Não tem</div>
-    </div>
+        <!-- Frente -->
+        <label>Frente:</label>
+        <div class="file-upload-wrapper">
+            <label for="fotoFrente" class="file-upload-btn">📷 Tirar Foto</label>
+            <input type="file" id="fotoFrente" accept="image/*" onchange="previewImage(this, 'previewFrente')" required>
+            <img id="previewFrente" class="image-preview" alt="Preview Frente">
+        </div>
 
-    <div class="secao-label">Nível de óleo</div>
-    <div class="chips" id="chips-oleo">
-      <div class="chip" data-valor="Ok">Ok</div>
-      <div class="chip" data-valor="Baixo">Baixo</div>
-      <div class="chip" data-valor="Precisa trocar">Trocar</div>
-    </div>
+        <!-- Traseira -->
+        <label>Traseira:</label>
+        <div class="file-upload-wrapper">
+            <label for="fotoTraseira" class="file-upload-btn">📷 Tirar Foto</label>
+            <input type="file" id="fotoTraseira" accept="image/*" onchange="previewImage(this, 'previewTraseira')" required>
+            <img id="previewTraseira" class="image-preview" alt="Preview Traseira">
+        </div>
 
-    <div class="secao-label" id="label-arrefecimento">Líquido de arrefecimento</div>
-    <div class="chips" id="chips-arrefecimento">
-      <div class="chip" data-valor="Ok">Ok</div>
-      <div class="chip" data-valor="Baixo">Baixo</div>
-      <div class="chip" data-valor="Precisa completar">Completar</div>
-    </div>
+        <h3 class="section-title">Verificação Mecânica</h3>
 
-    <div class="campo" style="margin-top:18px;">
-      <label>Data da próxima troca de óleo</label>
-      <input type="date" id="campo-proxima-troca">
-    </div>
+        <label for="oleo">Nível de Óleo:</label>
+        <select id="oleo" required>
+            <option value="">Selecione...</option>
+            <option value="OK">Tá OK</option>
+            <option value="Nível Baixo">Nível Baixo</option>
+            <option value="Precisei Completar">Precisei Completar</option>
+        </select>
 
-    <div class="campo">
-      <label>Observação</label>
-      <textarea id="campo-observacao" placeholder="Alguma observação sobre o veículo?"></textarea>
-    </div>
+        <label for="dataProximaTrocaOleo">Data da próxima troca de óleo (Adesivo):</label>
+        <input type="date" id="dataProximaTrocaOleo" required>
 
-    <div class="aviso-erro" id="aviso-erro"></div>
-    <button class="btn-salvar" id="btn-salvar" onclick="salvarChecklist()">SALVAR CHECKLIST</button>
-  </div>
+        <label for="kmProximaTrocaOleo">KM da próxima troca de óleo (Adesivo):</label>
+        <input type="number" id="kmProximaTrocaOleo" placeholder="Ex: 95000" required>
 
-  <!-- TELA 3: ENVIANDO -->
-  <div class="tela" id="tela-enviando">
-    <div class="central">
-      <div class="spinner"></div>
-      <h2>Enviando checklist...</h2>
-      <p>Salvando fotos e dados no Drive</p>
-    </div>
-  </div>
+        <label for="arrefecimento">Nível de Arrefecimento:</label>
+        <select id="arrefecimento" required>
+            <option value="">Selecione...</option>
+            <option value="OK">Tá OK</option>
+            <option value="Nível Baixo">Nível Baixo</option>
+            <option value="Precisei Completar">Precisei Completar</option>
+        </select>
 
-  <!-- TELA 4: CONFIRMAÇÃO -->
-  <div class="tela" id="tela-confirmacao">
-    <div class="central">
-      <div class="check-sucesso">✓</div>
-      <h2>Checklist salvo com sucesso!</h2>
-      <p id="resumo-confirmacao"></p>
-      <button class="btn-novo" onclick="voltarParaLista()">Fazer outro checklist</button>
-    </div>
-  </div>
+        <label for="pneus">Verificação dos Pneus (4 + Estepe):</label>
+        <select id="pneus" onchange="checkPneus()" required>
+            <option value="">Selecione...</option>
+            <option value="Todos calibrados">Todos Calibrados</option>
+            <option value="Precisei calibrar">Precisei Calibrar</option>
+            <option value="Algum precisa trocar">Algum precisa trocar</option>
+        </select>
 
+        <div id="divTrocaPneu" class="hidden">
+            <label for="pneusDetalhe">Qual pneu precisa trocar?</label>
+            <input type="text" id="pneusDetalhe" placeholder="Ex: Dianteiro direito">
+
+            <label>Foto do pneu:</label>
+            <div class="file-upload-wrapper">
+                <label for="fotoPneu" class="file-upload-btn">📷 Tirar Foto</label>
+                <input type="file" id="fotoPneu" accept="image/*" onchange="previewImage(this, 'previewPneu')">
+                <img id="previewPneu" class="image-preview" alt="Preview Pneu">
+            </div>
+        </div>
+
+        <h3 class="section-title">Fechamento</h3>
+
+        <label>Foto do KM Total:</label>
+        <div class="file-upload-wrapper">
+            <label for="fotoKm" class="file-upload-btn">📷 Tirar Foto do Painel</label>
+            <input type="file" id="fotoKm" accept="image/*" onchange="previewImage(this, 'previewKm')" required>
+            <img id="previewKm" class="image-preview" alt="Preview KM">
+        </div>
+
+        <label for="km">Confirme o KM Total (Apenas números):</label>
+        <input type="number" id="km" placeholder="Ex: 85400" required>
+
+        <button type="button" id="btnSubmit" class="submit-btn" onclick="enviarDados()">Enviar Checklist</button>
+        <div id="loader" class="loader">⏳ Sincronizando com a base de dados...</div>
+    </form>
 </div>
 
 <script>
-/* ===================== CONFIGURAÇÃO ===================== */
-const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbxZ65Z2JkOk4dhIHKS4oRalVHIP9y2vpGqc72qC53RpVJVEl8Khu4ZMIEs9kkKH_5AEPw/exec";
-
-const VEICULOS = {
-  carros: [
-    { nome:"Carro 10", placa:"QYC8082", tipo:"carro" },
-    { nome:"Carro 11", placa:"KGS2428", tipo:"carro" },
-    { nome:"Carro 12", placa:"KGH7876", tipo:"carro" },
-    { nome:"Carro 13", placa:"PCD7H81", tipo:"carro" },
-    { nome:"Carro 14", placa:"PDM5A02", tipo:"carro" },
-    { nome:"Carro 15", placa:"SOU2G19", tipo:"carro" },
-  ],
-  motos: [
-    { nome:"Moto 00", placa:"KGG6C97", tipo:"moto" },
-    { nome:"Moto 01", placa:"RZK9G76", tipo:"moto" },
-    { nome:"Moto 02", placa:"RZK9E26", tipo:"moto" },
-    { nome:"Moto 03", placa:"QYW5H43", tipo:"moto" },
-    { nome:"Moto 04", placa:"QYW5F83", tipo:"moto" },
-    { nome:"Moto 05", placa:"SOT3E81", tipo:"moto" },
-  ]
-};
-
-/* ===================== ESTADO ===================== */
-let veiculoSelecionado = null;
-let fotos = { frente:null, traseira:null, lateralEsquerda:null, lateralDireita:null, km:null };
-let selecoes = { pneus:null, estepe:null, oleo:null, arrefecimento:null };
-
-/* ===================== MONTAGEM DA LISTA ===================== */
-function montarLista(){
-  const listaCarros = document.getElementById('lista-carros');
-  const listaMotos = document.getElementById('lista-motos');
-  VEICULOS.carros.forEach(v => listaCarros.appendChild(criarBotaoVeiculo(v)));
-  VEICULOS.motos.forEach(v => listaMotos.appendChild(criarBotaoVeiculo(v)));
-}
-function criarBotaoVeiculo(v){
-  const btn = document.createElement('button');
-  btn.className = 'veiculo-btn';
-  btn.innerHTML = `<span>${v.nome}</span><span class="veiculo-placa">${v.placa}</span>`;
-  btn.onclick = () => selecionarVeiculo(v);
-  return btn;
-}
-function selecionarVeiculo(v){
-  veiculoSelecionado = v;
-  fotos = { frente:null, traseira:null, lateralEsquerda:null, lateralDireita:null, km:null };
-  selecoes = { pneus:null, estepe:null, oleo:null, arrefecimento:null };
-  document.getElementById('nome-veiculo-atual').textContent = v.nome;
-  document.getElementById('placa-veiculo-atual').textContent = v.placa;
-
-  const ehMoto = v.tipo === 'moto';
-  const displayEstepe = ehMoto ? 'none' : '';
-  document.getElementById('label-estepe').style.display = displayEstepe;
-  document.getElementById('chips-estepe').style.display = displayEstepe;
-  document.getElementById('label-arrefecimento').style.display = displayEstepe;
-  document.getElementById('chips-arrefecimento').style.display = displayEstepe;
-
-  resetarFormulario();
-  mostrarTela('tela-checklist');
-}
-function resetarFormulario(){
-  document.getElementById('campo-responsavel').value = '';
-  document.getElementById('campo-km').value = '';
-  document.getElementById('campo-proxima-troca').value = '';
-  document.getElementById('campo-observacao').value = '';
-  document.getElementById('aviso-erro').style.display = 'none';
-  document.querySelectorAll('.chip').forEach(c => c.classList.remove('selecionado'));
-  document.querySelectorAll('.foto-slot').forEach(slot=>{
-    slot.classList.remove('preenchido');
-    slot.querySelector('img')?.remove();
-    const icone = slot.querySelector('.icone');
-    const rotulo = slot.querySelector('.rotulo');
-    if(icone) icone.style.display = '';
-    if(rotulo) rotulo.style.display = '';
-  });
-}
-
-/* ===================== CHIPS (SELEÇÃO ÚNICA) ===================== */
-document.querySelectorAll('.chips').forEach(grupo=>{
-  const chaveGrupo = grupo.id.replace('chips-','');
-  grupo.querySelectorAll('.chip').forEach(chip=>{
-    chip.onclick = () => {
-      grupo.querySelectorAll('.chip').forEach(c => c.classList.remove('selecionado'));
-      chip.classList.add('selecionado');
-      selecoes[chaveGrupo] = chip.getAttribute('data-valor');
-    };
-  });
-});
-
-/* ===================== FOTOS ===================== */
-function carregarFoto(input, chave){
-  const arquivo = input.files[0];
-  if(!arquivo) return;
-  const leitor = new FileReader();
-  leitor.onload = e => {
-    fotos[chave] = e.target.result; // base64
-    const slot = input.closest('.foto-slot');
-    slot.classList.add('preenchido');
-    let img = slot.querySelector('img');
-    if(!img){
-      img = document.createElement('img');
-      slot.insertBefore(img, slot.querySelector('input'));
+    // Função para mostrar a miniatura da foto
+    function previewImage(input, previewId) {
+        const preview = document.getElementById(previewId);
+        const btnLabel = input.previousElementSibling;
+        
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.classList.add('visible');
+                btnLabel.innerText = "🔄 Trocar Foto";
+            }
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            preview.src = "";
+            preview.classList.remove('visible');
+            btnLabel.innerText = "📷 Tirar Foto";
+        }
     }
-    img.src = e.target.result;
-    slot.querySelector('.icone').style.display = 'none';
-    slot.querySelector('.rotulo').style.display = 'none';
-  };
-  leitor.readAsDataURL(arquivo);
-}
 
-/* ===================== NAVEGAÇÃO ===================== */
-function mostrarTela(id){
-  document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
-  document.getElementById(id).classList.add('ativa');
-}
-function voltarParaLista(){
-  mostrarTela('tela-veiculos');
-}
+    // Função para exibir o campo condicional dos pneus
+    function checkPneus() {
+        var status = document.getElementById('pneus').value;
+        const divDetalhe = document.getElementById('divTrocaPneu');
+        if (status === 'Algum precisa trocar') {
+            divDetalhe.classList.remove('hidden');
+            document.getElementById('pneusDetalhe').required = true;
+            document.getElementById('fotoPneu').required = true;
+        } else {
+            divDetalhe.classList.add('hidden');
+            document.getElementById('pneusDetalhe').required = false;
+            document.getElementById('pneusDetalhe').value = "";
+            document.getElementById('fotoPneu').required = false;
+            document.getElementById('fotoPneu').value = "";
+            document.getElementById('previewPneu').classList.remove('visible');
+        }
+    }
 
-/* ===================== VALIDAÇÃO E ENVIO ===================== */
-function mostrarErro(msg){
-  const aviso = document.getElementById('aviso-erro');
-  aviso.textContent = msg;
-  aviso.style.display = 'block';
-}
-function salvarChecklist(){
-  const responsavel = document.getElementById('campo-responsavel').value.trim();
-  const km = document.getElementById('campo-km').value.trim();
-  const proximaTroca = document.getElementById('campo-proxima-troca').value;
-  const observacao = document.getElementById('campo-observacao').value.trim();
+    // Função para converter arquivo em Base64
+    function toBase64(file) {
+        return new Promise((resolve, reject) => {
+            if (!file) { resolve(null); return; }
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
 
-  const ehMoto = veiculoSelecionado.tipo === 'moto';
+    // Função principal de envio
+    async function enviarDados() {
+        // Validação básica do formulário HTML5
+        const form = document.getElementById('checklistForm');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
 
-  if(!fotos.frente || !fotos.traseira || !fotos.lateralEsquerda || !fotos.lateralDireita){
-    mostrarErro('Tire as 4 fotos do veículo antes de salvar.'); return;
-  }
-  if(!responsavel){ mostrarErro('Informe o responsável pelo veículo hoje.'); return; }
-  if(!km){ mostrarErro('Informe o KM total do veículo.'); return; }
-  if(!fotos.km){ mostrarErro('Tire a foto do painel mostrando o KM.'); return; }
-  if(!selecoes.pneus){ mostrarErro('Selecione a condição dos pneus.'); return; }
-  if(!ehMoto && !selecoes.estepe){ mostrarErro('Selecione a condição do estepe.'); return; }
-  if(!selecoes.oleo){ mostrarErro('Selecione o nível de óleo.'); return; }
-  if(!ehMoto && !selecoes.arrefecimento){ mostrarErro('Selecione o nível do líquido de arrefecimento.'); return; }
-  if(!proximaTroca){ mostrarErro('Informe a data da próxima troca de óleo.'); return; }
-  if(!observacao){ mostrarErro('Preencha o campo de observação.'); return; }
+        const btn = document.getElementById('btnSubmit');
+        const loader = document.getElementById('loader');
+        
+        btn.disabled = true;
+        btn.innerText = 'Processando...';
+        loader.style.display = 'block';
 
-  document.getElementById('aviso-erro').style.display = 'none';
-  mostrarTela('tela-enviando');
+        try {
+            // Conversão em paralelo para otimizar velocidade
+            const fotosPromisses = {
+                'Lateral_Esquerda': toBase64(document.getElementById('fotoLE').files[0]),
+                'Lateral_Direita': toBase64(document.getElementById('fotoLD').files[0]),
+                'Frente': toBase64(document.getElementById('fotoFrente').files[0]),
+                'Traseira': toBase64(document.getElementById('fotoTraseira').files[0]),
+                'KM_Painel': toBase64(document.getElementById('fotoKm').files[0]),
+                'Pneu_Detalhe': toBase64(document.getElementById('fotoPneu').files[0])
+            };
 
-  const dados = {
-    veiculo: `${veiculoSelecionado.nome} - ${veiculoSelecionado.placa}`,
-    responsavel, km,
-    pneus: selecoes.pneus,
-    estepe: ehMoto ? 'Não se aplica' : selecoes.estepe,
-    oleo: selecoes.oleo,
-    arrefecimento: ehMoto ? 'Não se aplica' : selecoes.arrefecimento,
-    proximaTroca,
-    observacao
-  };
+            const fotos = {
+                'Lateral_Esquerda': await fotosPromisses['Lateral_Esquerda'],
+                'Lateral_Direita': await fotosPromisses['Lateral_Direita'],
+                'Frente': await fotosPromisses['Frente'],
+                'Traseira': await fotosPromisses['Traseira'],
+                'KM_Painel': await fotosPromisses['KM_Painel'],
+                'Pneu_Detalhe': await fotosPromisses['Pneu_Detalhe']
+            };
 
-  const corpo = new URLSearchParams();
-  corpo.append('dados', JSON.stringify(dados));
-  corpo.append('fotoFrente', fotos.frente);
-  corpo.append('fotoTraseira', fotos.traseira);
-  corpo.append('fotoLateralEsquerda', fotos.lateralEsquerda);
-  corpo.append('fotoLateralDireita', fotos.lateralDireita);
-  corpo.append('fotoKm', fotos.km);
+            const payload = {
+                condutor: document.getElementById('condutor').value,
+                carro: document.getElementById('carro').value,
+                oleo: document.getElementById('oleo').value,
+                dataProximaTrocaOleo: document.getElementById('dataProximaTrocaOleo').value,
+                kmProximaTrocaOleo: document.getElementById('kmProximaTrocaOleo').value,
+                arrefecimento: document.getElementById('arrefecimento').value,
+                pneus: document.getElementById('pneus').value,
+                pneusDetalhe: document.getElementById('pneusDetalhe').value,
+                km: document.getElementById('km').value,
+                fotos: fotos
+            };
 
-  fetch(URL_APPS_SCRIPT, { method:'POST', body: corpo })
-    .then(r => r.json())
-    .then(resposta => {
-      if(resposta.sucesso){
-        document.getElementById('resumo-confirmacao').textContent =
-          `${dados.veiculo} • ${new Date().toLocaleString('pt-BR')}`;
-        mostrarTela('tela-confirmacao');
-      } else {
-        mostrarTela('tela-checklist');
-        mostrarErro('Não foi possível salvar. Tente novamente. (' + resposta.mensagem + ')');
-      }
-    })
-    .catch(erro => {
-      mostrarTela('tela-checklist');
-      mostrarErro('Sem conexão ou erro no envio. Verifique a internet e tente novamente.');
-    });
-}
+            // INSIRA A URL DO GOOGLE APPS SCRIPT ABAIXO
+            const api_url = "https://script.google.com/macros/s/AKfycbyntbdpHPxQ329e0TnGgCwpt2-96P_xhtVg1LSqd4g2WTAkmLlG2YvHmqueEsvTzE1Q/exec"; 
 
-montarLista();
+            const response = await fetch(api_url, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+            
+            if(result.status === "success") {
+                alert("✅ Checklist concluído com sucesso!");
+                form.reset();
+                // Limpa as miniaturas das fotos
+                document.querySelectorAll('.image-preview').forEach(img => img.classList.remove('visible'));
+                document.querySelectorAll('.file-upload-btn').forEach(lbl => lbl.innerText = "📷 Tirar Foto");
+                document.getElementById('divTrocaPneu').classList.add('hidden');
+                
+                // Rola para o topo
+                window.scrollTo(0, 0);
+            } else {
+                alert("❌ Erro ao enviar para o Drive: " + result.message);
+            }
+
+        } catch (error) {
+            console.error(error);
+            alert("❌ Falha na conexão. Verifique a internet e se todas as fotos foram tiradas.");
+        } finally {
+            btn.disabled = false;
+            btn.innerText = 'Enviar Checklist';
+            loader.style.display = 'none';
+        }
+    }
 </script>
+
 </body>
 </html>
