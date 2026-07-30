@@ -214,7 +214,24 @@
     <form id="checklistForm">
         
         <label for="condutor">Nome do Condutor:</label>
-        <input type="text" id="condutor" placeholder="Nome do condutor" required>
+        <select id="condutor" onchange="checkCondutor()" required>
+            <option value="">Selecione o condutor</option>
+            <option value="Flávio">Flávio</option>
+            <option value="David">David</option>
+            <option value="Vinicius">Vinicius</option>
+            <option value="Rodrigo">Rodrigo</option>
+            <option value="Leonardo">Leonardo</option>
+            <option value="Luciano">Luciano</option>
+            <option value="Freitas">Freitas</option>
+            <option value="Ewerton">Ewerton</option>
+            <option value="Eudes">Eudes</option>
+            <option value="Outro">Outro (técnico novo)</option>
+        </select>
+
+        <div id="divOutroCondutor" class="hidden">
+            <label for="condutorOutro">Digite o nome do condutor:</label>
+            <input type="text" id="condutorOutro" placeholder="Nome completo">
+        </div>
 
         <label for="carro">Viatura:</label>
         <select id="carro" required>
@@ -353,6 +370,20 @@
         }
     }
 
+    // Função para mostrar o campo de texto quando escolher "Outro" no condutor
+    function checkCondutor() {
+        var valor = document.getElementById('condutor').value;
+        const divOutro = document.getElementById('divOutroCondutor');
+        if (valor === 'Outro') {
+            divOutro.classList.remove('hidden');
+            document.getElementById('condutorOutro').required = true;
+        } else {
+            divOutro.classList.add('hidden');
+            document.getElementById('condutorOutro').required = false;
+            document.getElementById('condutorOutro').value = "";
+        }
+    }
+
     // Função para exibir o campo condicional dos pneus
     function checkPneus() {
         var status = document.getElementById('pneus').value;
@@ -418,8 +449,12 @@
                 'Pneu_Detalhe': await fotosPromisses['Pneu_Detalhe']
             };
 
+            const nomeCondutor = document.getElementById('condutor').value === 'Outro'
+                ? document.getElementById('condutorOutro').value
+                : document.getElementById('condutor').value;
+
             const payload = {
-                condutor: document.getElementById('condutor').value,
+                condutor: nomeCondutor,
                 carro: document.getElementById('carro').value,
                 oleo: document.getElementById('oleo').value,
                 dataProximaTrocaOleo: document.getElementById('dataProximaTrocaOleo').value,
@@ -448,6 +483,7 @@
                 document.querySelectorAll('.image-preview').forEach(img => img.classList.remove('visible'));
                 document.querySelectorAll('.file-upload-btn').forEach(lbl => lbl.innerText = "📷 Tirar Foto");
                 document.getElementById('divTrocaPneu').classList.add('hidden');
+                document.getElementById('divOutroCondutor').classList.add('hidden');
                 
                 // Rola para o topo
                 window.scrollTo(0, 0);
