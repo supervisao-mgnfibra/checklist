@@ -230,11 +230,11 @@
 
         <div id="divOutroCondutor" class="hidden">
             <label for="condutorOutro">Digite o nome do condutor:</label>
-            <input type="text" id="condutorOutro" placeholder="Nome completo">
+            <input type="text" id="condutorOutro" placeholder="Nome">
         </div>
 
         <label for="carro">Viatura:</label>
-        <select id="carro" required>
+        <select id="carro" onchange="checkVeiculo()" required>
             <option value="">Selecione a Viatura</option>
             <optgroup label="Carros">
                 <option value="CARRO 10 - QYC8082">CARRO 10 - QYC8082</option>
@@ -298,21 +298,25 @@
             <option value="Precisei Completar">Precisei Completar</option>
         </select>
 
-        <label for="dataProximaTrocaOleo">Data da próxima troca de óleo (Adesivo):</label>
-        <input type="date" id="dataProximaTrocaOleo" required>
+        <div id="divDataTrocaOleo">
+            <label for="dataProximaTrocaOleo">Data da próxima troca de óleo (Adesivo):</label>
+            <input type="date" id="dataProximaTrocaOleo" required>
+        </div>
 
-        <label for="kmProximaTrocaOleo">KM da próxima troca de óleo (Adesivo):</label>
+        <label id="labelKmTrocaOleo" for="kmProximaTrocaOleo">KM da próxima troca de óleo (Adesivo):</label>
         <input type="number" id="kmProximaTrocaOleo" placeholder="Ex: 95000" required>
 
-        <label for="arrefecimento">Nível de Arrefecimento:</label>
-        <select id="arrefecimento" required>
-            <option value="">Selecione...</option>
-            <option value="OK">Tá OK</option>
-            <option value="Nível Baixo">Nível Baixo</option>
-            <option value="Precisei Completar">Precisei Completar</option>
-        </select>
+        <div id="divArrefecimento">
+            <label for="arrefecimento">Nível de Arrefecimento:</label>
+            <select id="arrefecimento" required>
+                <option value="">Selecione...</option>
+                <option value="OK">Tá OK</option>
+                <option value="Nível Baixo">Nível Baixo</option>
+                <option value="Precisei Completar">Precisei Completar</option>
+            </select>
+        </div>
 
-        <label for="pneus">Verificação dos Pneus (4 + Estepe):</label>
+        <label id="labelPneus" for="pneus">Verificação dos Pneus (4 + Estepe):</label>
         <select id="pneus" onchange="checkPneus()" required>
             <option value="">Selecione...</option>
             <option value="Todos calibrados">Todos Calibrados</option>
@@ -370,6 +374,37 @@
         }
     }
 
+    // Função que verifica se é moto e ajusta os campos (sem arrefecimento, sem estepe, sem adesivo de data)
+    function checkVeiculo() {
+        var valor = document.getElementById('carro').value;
+        var ehMoto = valor.startsWith('MOTO');
+        const divArref = document.getElementById('divArrefecimento');
+        const labelPneus = document.getElementById('labelPneus');
+        const divDataTroca = document.getElementById('divDataTrocaOleo');
+        const labelKmTroca = document.getElementById('labelKmTrocaOleo');
+        const campoKmTroca = document.getElementById('kmProximaTrocaOleo');
+
+        if (ehMoto) {
+            divArref.classList.add('hidden');
+            document.getElementById('arrefecimento').required = false;
+            labelPneus.textContent = 'Verificação dos Pneus:';
+
+            divDataTroca.classList.add('hidden');
+            document.getElementById('dataProximaTrocaOleo').required = false;
+            labelKmTroca.textContent = 'KM do TRIP (desde a última troca de óleo):';
+            campoKmTroca.placeholder = 'Ex: 850 (óleo roda 1500km)';
+        } else {
+            divArref.classList.remove('hidden');
+            document.getElementById('arrefecimento').required = true;
+            labelPneus.textContent = 'Verificação dos Pneus (4 + Estepe):';
+
+            divDataTroca.classList.remove('hidden');
+            document.getElementById('dataProximaTrocaOleo').required = true;
+            labelKmTroca.textContent = 'KM da próxima troca de óleo (Adesivo):';
+            campoKmTroca.placeholder = 'Ex: 95000';
+        }
+    }
+
     // Função para mostrar o campo de texto quando escolher "Outro" no condutor
     function checkCondutor() {
         var valor = document.getElementById('condutor').value;
@@ -402,14 +437,41 @@
         }
     }
 
-    // Função para converter arquivo em Base64
+    // Função para converter e COMPRIMIR a foto antes de enviar
+    // Reduz o tamanho do arquivo em até 80-90%, mantendo qualidade suficiente para conferência
     function toBase64(file) {
         return new Promise((resolve, reject) => {
             if (!file) { resolve(null); return; }
+
             const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const larguraMax = 1280;
+                    const alturaMax = 1280;
+                    let largura = img.width;
+                    let altura = img.height;
+
+                    if (largura > larguraMax || altura > alturaMax) {
+                        const proporcao = Math.min(larguraMax / largura, alturaMax / altura);
+                        largura = Math.round(largura * proporcao);
+                        altura = Math.round(altura * proporcao);
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = largura;
+                    canvas.height = altura;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, largura, altura);
+
+                    // Qualidade 0.7 = bom equilíbrio entre nitidez e tamanho do arquivo
+                    resolve(canvas.toDataURL('image/jpeg', 0.7));
+                };
+                img.onerror = () => reject(new Error('Não foi possível processar a imagem'));
+                img.src = e.target.result;
+            };
             reader.onerror = error => reject(error);
+            reader.readAsDataURL(file);
         });
     }
 
@@ -453,13 +515,15 @@
                 ? document.getElementById('condutorOutro').value
                 : document.getElementById('condutor').value;
 
+            const ehMoto = document.getElementById('carro').value.startsWith('MOTO');
+
             const payload = {
                 condutor: nomeCondutor,
                 carro: document.getElementById('carro').value,
                 oleo: document.getElementById('oleo').value,
-                dataProximaTrocaOleo: document.getElementById('dataProximaTrocaOleo').value,
+                dataProximaTrocaOleo: ehMoto ? '' : document.getElementById('dataProximaTrocaOleo').value,
                 kmProximaTrocaOleo: document.getElementById('kmProximaTrocaOleo').value,
-                arrefecimento: document.getElementById('arrefecimento').value,
+                arrefecimento: ehMoto ? 'Não se aplica (moto)' : document.getElementById('arrefecimento').value,
                 pneus: document.getElementById('pneus').value,
                 pneusDetalhe: document.getElementById('pneusDetalhe').value,
                 km: document.getElementById('km').value,
@@ -484,6 +548,7 @@
                 document.querySelectorAll('.file-upload-btn').forEach(lbl => lbl.innerText = "📷 Tirar Foto");
                 document.getElementById('divTrocaPneu').classList.add('hidden');
                 document.getElementById('divOutroCondutor').classList.add('hidden');
+                checkVeiculo();
                 
                 // Rola para o topo
                 window.scrollTo(0, 0);
